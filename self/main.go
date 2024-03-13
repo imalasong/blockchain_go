@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func main() {
 	//blockchain := NewBlockchain()
 	//
@@ -14,11 +16,11 @@ func main() {
 	//	fmt.Println()
 	//}
 
-	bc := NewBlockchain()
-	defer bc.db.Close()
-
-	cli := CLI{bc}
-	cli.Run()
+	//bc := NewBlockchain()
+	//defer bc.db.Close()
+	//
+	//cli := CLI{bc}
+	//cli.Run()
 
 	//data1 := []byte("I like donuts")
 	//data2 := []byte("I like donutsca07ca")
@@ -31,4 +33,19 @@ func main() {
 	//
 	//fmt.Println(len(sha256.Sum256(data1)))
 	//fmt.Println(sha256.Sum256(data1))
+out:
+	for i := 1; i < 10; i++ {
+		if i == 5 {
+			continue out
+		}
+		fmt.Println(i)
+	}
+	for i := 100; i < 110; i++ {
+		//if i == 105 {
+		//	continue out
+		//}
+		fmt.Println(i)
+	}
+
+	fmt.Println("2222")
 }

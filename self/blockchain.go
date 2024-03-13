@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/boltdb/bolt"
 )
@@ -12,8 +13,9 @@ type Blockchain struct {
 
 const dbFile = "./a.db"
 const blocksBucket = "blocks"
+const genesisCoinbaseData = "hello aaaaa"
 
-func NewBlockchain() *Blockchain {
+func NewBlockchain(address string) *Blockchain {
 	//return &Blockchain{[]*Block{CreateGenesisBlock()}}
 	var tip []byte
 	db, _ := bolt.Open(dbFile, 0600, nil)
@@ -22,7 +24,8 @@ func NewBlockchain() *Blockchain {
 		b := tx.Bucket([]byte(blocksBucket))
 
 		if b == nil {
-			genesis := CreateGenesisBlock()
+			cbtx := NewCoinbaseTX(address, genesisCoinbaseData)
+			genesis := CreateGenesisBlock(cbtx)
 			b, _ := tx.CreateBucket([]byte(blocksBucket))
 			_ = b.Put(genesis.Hash, genesis.Serialize())
 			_ = b.Put([]byte("l"), genesis.Hash)
@@ -56,7 +59,7 @@ func (bc *Blockchain) AddBlock(data string) {
 		panic(err)
 	}
 
-	newBlock := NewBlock(data, lastHash)
+	newBlock := NewBlock(nil, lastHash)
 
 	err = bc.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
@@ -76,4 +79,49 @@ func (bc *Blockchain) Iterator() *BlockchainIterator {
 	bci := &BlockchainIterator{bc.tip, bc.db}
 
 	return bci
+}
+
+func (bc *Blockchain) FindUnspentTransactions(address string) []Transaction {
+	var unspentTXs []Transaction
+	spentTXOs := make(map[string][]int)
+	bci := bc.Iterator()
+
+	for {
+		block := bci.Next()
+
+		for _, tx := range block.Transactions {
+			txID := hex.EncodeToString(tx.ID)
+
+		Outputs:
+			for outIdx, out := range tx.Vout {
+				// Was the output spent?
+				if spentTXOs[txID] != nil {
+					for _, spentOut := range spentTXOs[txID] {
+						if spentOut == outIdx {
+							continue Outputs
+						}
+					}
+				}
+
+				if out.CanBeUnlockedWith(address) {
+					unspentTXs = append(unspentTXs, *tx)
+				}
+			}
+
+			if tx.IsCoinbase() == false {
+				for _, in := range tx.Vin {
+					if in.CanUnlockOutputWith(address) {
+						inTxID := hex.EncodeToString(in.Txid)
+						spentTXOs[inTxID] = append(spentTXOs[inTxID], in.Vout)
+					}
+				}
+			}
+		}
+
+		if len(block.PrevBlockHash) == 0 {
+			break
+		}
+	}
+
+	return unspentTXs
 }
