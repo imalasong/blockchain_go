@@ -1,2 +1,10 @@
 *.db
 *.dat
+*.exe
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+*.jar
