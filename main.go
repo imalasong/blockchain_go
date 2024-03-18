@@ -15,7 +15,6 @@ func main() {
 	//for key, item := range maps {
 	//	fmt.Printf("/%s \t %v \n", key, item)
 	//}
-
 	cli := CLI{}
 	cli.Run()
 }

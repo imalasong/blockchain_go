@@ -24,7 +24,7 @@ func (cli *CLI) printUsage() {
 }
 
 func (cli *CLI) validateArgs() {
-	if len(os.Args) < 2 {
+	if len(os.Args) < 3 {
 		cli.printUsage()
 		os.Exit(1)
 	}
@@ -34,7 +34,8 @@ func (cli *CLI) validateArgs() {
 func (cli *CLI) Run() {
 	cli.validateArgs()
 
-	nodeID := os.Getenv("NODE_ID")
+	//nodeID := os.Getenv("NODE_ID")
+	nodeID := os.Args[1]
 	if nodeID == "" {
 		fmt.Printf("NODE_ID env. var is not set!")
 		os.Exit(1)
@@ -57,44 +58,44 @@ func (cli *CLI) Run() {
 	sendMine := sendCmd.Bool("mine", false, "Mine immediately on the same node")
 	startNodeMiner := startNodeCmd.String("miner", "", "Enable mining mode and send reward to ADDRESS")
 
-	switch os.Args[1] {
+	switch os.Args[2] {
 	case "getbalance":
-		err := getBalanceCmd.Parse(os.Args[2:])
+		err := getBalanceCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "createblockchain":
-		err := createBlockchainCmd.Parse(os.Args[2:])
+		err := createBlockchainCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "createwallet":
-		err := createWalletCmd.Parse(os.Args[2:])
+		err := createWalletCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "listaddresses":
-		err := listAddressesCmd.Parse(os.Args[2:])
+		err := listAddressesCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "printchain":
-		err := printChainCmd.Parse(os.Args[2:])
+		err := printChainCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "reindexutxo":
-		err := reindexUTXOCmd.Parse(os.Args[2:])
+		err := reindexUTXOCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "send":
-		err := sendCmd.Parse(os.Args[2:])
+		err := sendCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "startnode":
-		err := startNodeCmd.Parse(os.Args[2:])
+		err := startNodeCmd.Parse(os.Args[3:])
 		if err != nil {
 			log.Panic(err)
 		}
