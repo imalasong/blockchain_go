@@ -146,11 +146,6 @@ func (cli *CLI) Run() {
 	}
 
 	if startNodeCmd.Parsed() {
-		nodeID := os.Getenv("NODE_ID")
-		if nodeID == "" {
-			startNodeCmd.Usage()
-			os.Exit(1)
-		}
 		cli.startNode(nodeID, *startNodeMiner)
 	}
 }
